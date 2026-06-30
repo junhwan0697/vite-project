@@ -1,12 +1,25 @@
 /* 폰트 */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
-/* 1. CSS 변수 정의 (색상 관리가 매우 쉬워집니다) */
+/* 1. CSS 변수 설정 (다크모드 기본) */
 :root {
   --primary-gradient: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+  --bg-gradient: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
   --text-color: #ffffff;
+  --input-bg: rgba(0, 0, 0, 0.2);
+  --focus-color: #4facfe;
+}
+
+/* 2. 라이트 모드 변수 덮어쓰기 */
+.app-wrapper.light {
+  --bg-gradient: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #e0c3fc);
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --text-color: #333333;
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --focus-color: #007bff;
 }
 
 * {
@@ -16,9 +29,14 @@
   font-family: "Pretendard", sans-serif;
 }
 
-/* 2. 배경 애니메이션 */
 body {
-  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. 전체 래퍼 및 배경 애니메이션 */
+.app-wrapper {
+  background: var(--bg-gradient);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
   display: flex;
@@ -26,6 +44,8 @@ body {
   align-items: center;
   min-height: 100vh;
   color: var(--text-color);
+  transition: all 0.5s ease;
+  position: relative;
 }
 
 @keyframes gradientBG {
@@ -40,23 +60,48 @@ body {
   }
 }
 
-/* 3. 메인 컨테이너 */
+/* 4. 다크/라이트 토글 버튼 */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  font-weight: bold;
+  backdrop-filter: blur(5px);
+  transition: 0.3s;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 5. 메인 글래스모피즘 컨테이너 */
 .container {
   background: var(--glass-bg);
   backdrop-filter: blur(15px);
-  padding: 40px;
-  border-radius: 25px;
+  -webkit-backdrop-filter: blur(15px);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   width: 900px;
+  max-width: 95%;
 }
 
 header h1 {
   text-align: center;
   margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
-/* 4. 번역기 영역 (Flexbox 배치) */
+/* 6. 레이아웃 (입/출력창 및 버튼) */
 .translator-box {
   display: flex;
   gap: 20px;
@@ -65,61 +110,89 @@ header h1 {
 
 .input-area,
 .output-area {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 15px;
 }
 
-/* 5. 공통 컴포넌트 스타일 (select & textarea) */
 select {
-  padding: 10px;
+  appearance: none;
+  padding: 12px 15px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.2);
-  color: white;
+  background: var(--input-bg);
+  color: var(--text-color);
   border: 1px solid var(--glass-border);
+  font-size: 15px;
+  outline: none;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+select:focus,
+select:hover {
+  border-color: var(--focus-color);
 }
 
 select option {
   background: #203a43;
+  color: #fff; /* option 태그는 OS에 따라 다크모드 대응이 까다로워 기본색 유지 */
 }
 
 textarea {
   height: 250px;
   padding: 20px;
   border-radius: 15px;
-  background: rgba(0, 0, 0, 0.2);
-  color: white;
+  background: var(--input-bg);
+  color: var(--text-color);
   border: 1px solid var(--glass-border);
   resize: none;
-  outline: none;
   font-size: 16px;
-  transition: border 0.3s;
+  line-height: 1.6;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+textarea::placeholder {
+  color: inherit;
+  opacity: 0.6;
 }
 
 textarea:focus {
-  border-color: #4facfe;
+  border-color: var(--focus-color);
+  box-shadow: 0 0 15px rgba(79, 172, 254, 0.2);
 }
 
-/* 6. ActionArea(버튼 영역) 스타일 */
+textarea::-webkit-scrollbar {
+  width: 8px;
+}
+textarea::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 10px;
+}
+textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 7. Action Area (중앙 버튼 영역) */
 .action-area {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  gap: 15px;
 }
 
-/* 가운데 버튼 */
 #swap-btn {
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--input-bg);
+  color: var(--text-color);
   border: 1px solid var(--glass-border);
+  font-size: 20px;
   cursor: pointer;
-  transition: 0.3s;
-  margin-left: 25px;
+  transition: all 0.3s ease;
+  margin-left: 10px;
 }
 
 #swap-btn:hover {
@@ -128,33 +201,46 @@ textarea:focus {
 }
 
 #translate-btn {
-  padding: 15px 25px;
+  padding: 15px 30px;
   background: var(--primary-gradient);
   color: white;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-  transition: 0.3s;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 #translate-btn:hover:not(:disabled) {
   transform: translateY(-3px);
-}
-#translate-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5);
 }
 
-.answer-btn {
-  padding: 15px 25px;
-  background: var(--primary-gradient);
-  color: white;
-  border: none;
+#translate-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+#learn-btn {
+  padding: 12px 20px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--glass-border);
   border-radius: 50px;
   cursor: pointer;
+  font-size: 14px;
   font-weight: bold;
-  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-  transition: 0.3s;
+  transition: 0.3s ease;
+}
+
+#learn-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
